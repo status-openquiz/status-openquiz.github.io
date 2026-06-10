@@ -1,0 +1,25 @@
+{
+    "version": 1,
+    "status": "outage",
+    "updated_at": "2026-06-11T10:30:00+07:00",
+    "incidents": [
+        {
+            "id": "20260611-web-down",
+            "title": {"vi": "Không thể truy cập web", "en": "Web not accessible"},
+            "status": "investigating",
+            "severity": "critical",
+            "message": {"vi": "Chúng tôi đang điều tra sự cố khiến người dùng không thể truy cập OpenQuiz. Sẽ cập nhật thêm sớm nhất.", "en": "We are investigating an issue preventing users from accessing OpenQuiz. Will update as soon as possible."},
+            "started_at": "2026-06-11T10:00:00+07:00",
+            "resolved_at": null
+        },
+        {
+            "id": "20260610-payment-down",
+            "title": {"vi": "Không thể thanh toán QR", "en": "QR payment not working"},
+            "status": "resolved",
+            "severity": "minor",
+            "message": {"vi": "Lỗi trang thanh toán từ bản cập nhật gần nhất. Đã cập nhật bản vá tức thì", "en": "QR payment page error from the latest update. Patched immediately."},
+            "started_at": "2026-06-10T18:10:00+07:00",
+            "resolved_at": "2026-06-10T19:05:00+07:00"
+        }
+    ]
+}
