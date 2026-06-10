@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<link rel="icon" href="https://openquiz.ai/logo.png" />
+<title>OpenQuiz — Status</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #21262d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 48px 24px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    object-fit: contain;
+  }
+
+  .header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .header span {
+    color: var(--muted);
+    font-size: 13px;
+    margin-left: auto;
+  }
+
+  /* current status banner */
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+
+  .dot-wrap {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .dot {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+
+  .operational  .dot { background: var(--green); }
+  .degraded     .dot { background: var(--yellow); }
+  .outage       .dot { background: var(--red); }
+  .maintenance  .dot { background: var(--muted); }
+
+  /* light pulse, only when operational */
+  .operational .dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%   { transform: scale(1);   opacity: 0.6; }
+    70%  { transform: scale(2.6); opacity: 0; }
+    100% { transform: scale(2.6); opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .operational .dot::after { animation: none; display: none; }
+  }
+
+  .status-text .label {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .operational  .label { color: var(--green); }
+  .degraded     .label { color: var(--yellow); }
+  .outage       .label { color: var(--red); }
+  .maintenance  .label { color: var(--muted); }
+
+  .status-text .sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* incident history */
+  .history {
+    margin-top: 36px;
+  }
+
+  .history h2 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .incident {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+  }
+
+  .incident.active { border-color: var(--red); }
+
+  .incident-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .incident-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .badge.critical { color: var(--red);    border-color: var(--red); }
+  .badge.major    { color: var(--yellow); border-color: var(--yellow); }
+  .badge.minor    { color: var(--muted); }
+  .badge.resolved { color: var(--green);  border-color: var(--green); }
+  .badge.ongoing  { color: var(--red);    border-color: var(--red); }
+
+  .incident-msg {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.55;
+    margin-top: 8px;
+  }
+
+  .incident-meta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 10px;
+    font-family: "JetBrains Mono", monospace;
+  }
+
+  .empty {
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* uptime */
+  .uptime {
+    margin-top: 36px;
+  }
+
+  .uptime-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+
+  .uptime-head h2 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+
+  .uptime-pct {
+    font-size: 13px;
+    font-weight: 600;
+    font-family: "JetBrains Mono", monospace;
+    color: var(--green);
+  }
+
+  .uptime-pct.degraded { color: var(--yellow); }
+  .uptime-pct.poor     { color: var(--red); }
+
+  .bar-chart {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+    height: 32px;
+  }
+
+  .bar-chart .bar {
+    flex: 1;
+    height: 100%;
+    border-radius: 2px;
+    background: var(--green);
+    cursor: default;
+    transition: opacity 0.1s;
+    position: relative;
+  }
+
+  .bar-chart .bar:hover { opacity: 0.75; }
+
+  .bar-chart .bar.has-incident  { background: var(--red); }
+  .bar-chart .bar.has-degraded  { background: var(--yellow); }
+  .bar-chart .bar.no-data       { background: var(--border); }
+
+  .bar-chart .bar .tip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 9px;
+    font-size: 11px;
+    color: var(--text);
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+    line-height: 1.5;
+  }
+
+  .bar-chart .bar:hover .tip { display: block; }
+
+  .uptime-range {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .footer code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 5px;
+  }
+</style>
+</head>
+<body>
+  <main class="card">
+    <div class="header">
+      <img class="logo" src="https://openquiz.ai/logo.png" alt="OpenQuiz logo" />
+      <h1>OpenQuiz</h1>
+      <span id="system-status">System Status</span>
+    </div>
+
+    <div class="status" id="status">
+      <div class="dot-wrap"><div class="dot"></div></div>
+      <div class="status-text">
+        <div class="label" id="label"></div>
+        <div class="sub" id="sub"></div>
+      </div>
+    </div>
+
+    <section class="uptime">
+      <div class="uptime-head">
+        <h2 id="uptime-title"></h2>
+        <span class="uptime-pct" id="uptime-pct"></span>
+      </div>
+      <div class="bar-chart" id="bar-chart"></div>
+      <div class="uptime-range">
+        <span id="uptime-from"></span>
+        <span id="uptime-to"></span>
+      </div>
+    </section>
+
+    <section class="history">
+      <h2 id="history-title"></h2>
+      <div id="incidents"></div>
+    </section>
+
+    <div class="footer">
+      <span id="checked"></span>
+      <code>status.json</code>
+    </div>
+  </main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  const LANG = (navigator.language || "en").toLowerCase().startsWith("vi") ? "vi" : "en";
+  const LOCALE = LANG === "vi" ? "vi-VN" : "en-US";
+  document.documentElement.lang = LANG;
+
+  const I18N = {
+    vi: {
+      pageTitle: "OpenQuiz — Trạng thái hệ thống",
+      systemStatus: "Trạng thái hệ thống",
+      checking: ["Đang kiểm tra…", "Đang tải status.json"],
+      history: "Lịch sử sự cố",
+      status: {
+        operational: ["Hoạt động bình thường", "Tất cả dịch vụ đang online"],
+        degraded:    ["Hiệu năng suy giảm", "Một số dịch vụ phản hồi chậm"],
+        outage:      ["Gián đoạn dịch vụ", "OpenQuiz hiện không khả dụng"],
+        maintenance: ["Đang bảo trì", "Dịch vụ tạm dừng để bảo trì theo lịch"],
+      },
+      updated: "Cập nhật",
+      noIncidents: "Chưa ghi nhận sự cố nào.",
+      untitled: "Sự cố không tên",
+      resolved: "Đã khắc phục",
+      ongoing: "Đang xử lý",
+      started: "Bắt đầu",
+      fixed: "Khắc phục",
+      durationLabel: "Thời lượng",
+      minutes: "phút",
+      hours: "giờ",
+      downtime: "Gián đoạn",
+      uptime: "Uptime 90 ngày",
+      checkedAt: "Kiểm tra lúc",
+      loadError: "Không tải được status.json",
+    },
+    en: {
+      pageTitle: "OpenQuiz — System Status",
+      systemStatus: "System Status",
+      checking: ["Checking…", "Loading status.json"],
+      history: "Incident history",
+      status: {
+        operational: ["All systems operational", "All services are online"],
+        degraded:    ["Degraded performance", "Some services are responding slowly"],
+        outage:      ["Service outage", "OpenQuiz is currently unavailable"],
+        maintenance: ["Under maintenance", "Service is paused for scheduled maintenance"],
+      },
+      updated: "Updated",
+      noIncidents: "No incidents reported.",
+      untitled: "Untitled incident",
+      resolved: "Resolved",
+      ongoing: "Investigating",
+      started: "Started",
+      fixed: "Resolved",
+      durationLabel: "Duration",
+      minutes: "min",
+      hours: "h",
+      downtime: "Downtime",
+      uptime: "90-day uptime",
+      checkedAt: "Checked at",
+      loadError: "Failed to load status.json",
+    },
+  };
+
+  const T = I18N[LANG];
+
+  document.title = T.pageTitle;
+  $("system-status").textContent = T.systemStatus;
+  $("uptime-title").textContent = T.uptime;
+  $("history-title").textContent = T.history;
+  $("label").textContent = T.checking[0];
+  $("sub").textContent = T.checking[1];
+
+  // incident title/message can be a plain string or { en, vi }
+  const localize = (v) => (v && typeof v === "object") ? (v[LANG] || v.en || v.vi || "") : (v || "");
+
+  const SEVERITY_LABEL = { critical: "Critical", major: "Major", minor: "Minor" };
+
+  const fmt = (iso) => new Date(iso).toLocaleString(LOCALE, {
+    day: "2-digit", month: "2-digit", year: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  });
+
+  function duration(start, end) {
+    const ms = new Date(end) - new Date(start);
+    if (ms < 0 || isNaN(ms)) return null;
+    const m = Math.round(ms / 60000);
+    if (m < 60) return m + " " + T.minutes;
+    const h = Math.floor(m / 60);
+    return h + " " + T.hours + (m % 60 ? " " + (m % 60) + " " + T.minutes : "");
+  }
+
+  function renderStatus(state, updatedAt) {
+    const el = $("status");
+    el.classList.remove("operational", "degraded", "outage", "maintenance");
+    const key = T.status[state] ? state : "outage";
+    el.classList.add(key);
+    $("label").textContent = T.status[key][0];
+    $("sub").textContent = T.status[key][1] +
+      (updatedAt ? " · " + T.updated + " " + fmt(updatedAt) : "");
+  }
+
+  function renderIncidents(incidents) {
+    const box = $("incidents");
+    box.textContent = "";
+
+    if (!incidents || incidents.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.textContent = T.noIncidents;
+      box.appendChild(empty);
+      return;
+    }
+
+    const sorted = [...incidents].sort(
+      (a, b) => new Date(b.started_at) - new Date(a.started_at)
+    );
+
+    for (const inc of sorted) {
+      const resolved = inc.status === "resolved";
+      const item = document.createElement("article");
+      item.className = "incident" + (resolved ? "" : " active");
+
+      const head = document.createElement("div");
+      head.className = "incident-head";
+
+      const title = document.createElement("span");
+      title.className = "incident-title";
+      title.textContent = localize(inc.title) || T.untitled;
+      head.appendChild(title);
+
+      if (inc.severity && SEVERITY_LABEL[inc.severity]) {
+        const sev = document.createElement("span");
+        sev.className = "badge " + inc.severity;
+        sev.textContent = SEVERITY_LABEL[inc.severity];
+        head.appendChild(sev);
+      }
+
+      const state = document.createElement("span");
+      state.className = "badge " + (resolved ? "resolved" : "ongoing");
+      state.textContent = resolved ? T.resolved : T.ongoing;
+      head.appendChild(state);
+
+      item.appendChild(head);
+
+      const message = localize(inc.message);
+      if (message) {
+        const msg = document.createElement("p");
+        msg.className = "incident-msg";
+        msg.textContent = message;
+        item.appendChild(msg);
+      }
+
+      const meta = document.createElement("div");
+      meta.className = "incident-meta";
+
+      if (inc.started_at) {
+        const s = document.createElement("span");
+        s.textContent = T.started + ": " + fmt(inc.started_at);
+        meta.appendChild(s);
+      }
+      if (resolved && inc.resolved_at) {
+        const r = document.createElement("span");
+        r.textContent = T.fixed + ": " + fmt(inc.resolved_at);
+        meta.appendChild(r);
+        const d = duration(inc.started_at, inc.resolved_at);
+        if (d) {
+          const dd = document.createElement("span");
+          dd.textContent = T.durationLabel + ": " + d;
+          meta.appendChild(dd);
+        }
+      }
+      if (meta.children.length) item.appendChild(meta);
+
+      box.appendChild(item);
+    }
+  }
+
+  const DAYS = 90;
+
+  function renderUptime(incidents) {
+    const now = new Date();
+    const msPerDay = 86400000;
+    const windowStart = new Date(now - DAYS * msPerDay);
+
+    // Build per-day downtime map (local day key: YYYY-MM-DD)
+    const dayKey = (d) => d.toLocaleDateString("en-CA"); // YYYY-MM-DD in browser local tz
+    const downtimeByDay = {}; // key -> ms of downtime that day
+    const incidentByDay = {}; // key -> worst severity
+
+    const SEV_RANK = { critical: 3, major: 2, minor: 1 };
+
+    for (const inc of (incidents || [])) {
+      if (!inc.started_at) continue;
+      const start = new Date(inc.started_at);
+      const end   = inc.resolved_at ? new Date(inc.resolved_at) : now;
+      // Clip to the 90-day window
+      const s = start < windowStart ? windowStart : start;
+      const e = end   > now         ? now         : end;
+      if (s >= e) continue;
+
+      // Iterate each calendar day spanned (local midnight)
+      let cursor = new Date(s);
+      cursor.setHours(0, 0, 0, 0); // local midnight
+      while (cursor <= e) {
+        const k = dayKey(cursor);
+        const dayStart = cursor.getTime();
+        const dayEnd   = dayStart + msPerDay;
+        const overlap  = Math.min(e.getTime(), dayEnd) - Math.max(s.getTime(), dayStart);
+        if (overlap > 0) {
+          downtimeByDay[k] = (downtimeByDay[k] || 0) + overlap;
+          const rank = SEV_RANK[inc.severity] || 1;
+          if (!incidentByDay[k] || rank > SEV_RANK[incidentByDay[k]]) {
+            incidentByDay[k] = inc.severity || "minor";
+          }
+        }
+        cursor = new Date(dayStart + msPerDay);
+      }
+    }
+
+    // Total downtime in the window
+    const totalMs   = DAYS * msPerDay;
+    const downMs    = Object.values(downtimeByDay).reduce((a, b) => a + b, 0);
+    const uptimePct = ((totalMs - downMs) / totalMs * 100);
+
+    const pctEl = $("uptime-pct");
+    pctEl.textContent = uptimePct.toFixed(2) + "%";
+    pctEl.className = "uptime-pct" +
+      (uptimePct < 90 ? " poor" : uptimePct < 99 ? " degraded" : "");
+
+    // Range labels
+    const fmtDate = (d) => d.toLocaleDateString(LOCALE, { day: "2-digit", month: "short", year: "numeric" });
+    $("uptime-from").textContent = fmtDate(windowStart);
+    $("uptime-to").textContent   = fmtDate(now);
+
+    // Build bars oldest → newest
+    const chart = $("bar-chart");
+    chart.textContent = "";
+    for (let i = DAYS - 1; i >= 0; i--) {
+      const day = new Date(now - i * msPerDay);
+      const k   = dayKey(day);
+      const bar = document.createElement("div");
+      bar.className = "bar";
+      if (day > now) {
+        bar.classList.add("no-data");
+      } else if (incidentByDay[k]) {
+        bar.classList.add(incidentByDay[k] === "minor" ? "has-degraded" : "has-incident");
+      }
+
+      const tip = document.createElement("span");
+      tip.className = "tip";
+      const label = day.toLocaleDateString(LOCALE, { day: "2-digit", month: "short", year: "numeric" });
+      if (downtimeByDay[k]) {
+        const downMin = Math.round(downtimeByDay[k] / 60000);
+        const downStr = downMin < 60
+          ? downMin + " " + T.minutes
+          : Math.floor(downMin / 60) + " " + T.hours + (downMin % 60 ? " " + (downMin % 60) + " " + T.minutes : "");
+        tip.textContent = label + "\n" + T.downtime + ": " + downStr;
+      } else {
+        tip.textContent = label;
+      }
+      bar.appendChild(tip);
+      chart.appendChild(bar);
+    }
+  }
+
+  function render(data) {
+    renderStatus(data.status, data.updated_at);
+    renderUptime(data.incidents);
+    renderIncidents(data.incidents);
+    $("checked").textContent =
+      T.checkedAt + " " + new Date().toLocaleTimeString(LOCALE);
+  }
+
+  async function check() {
+    try {
+      const res = await fetch("status.json?t=" + Date.now(), {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" },
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      render(await res.json());
+    } catch (err) {
+      renderStatus("outage", null);
+      $("sub").textContent = T.loadError + " — " + err.message;
+      $("checked").textContent =
+        T.checkedAt + " " + new Date().toLocaleTimeString(LOCALE);
+    }
+  }
+
+  check();
+  setInterval(check, 60_000);
+</script>
+</body>
+</html>

@@ -1,8 +1,52 @@
 {
-    "online": true,
-    "error": {
-        "reason": null,
-        "message": null,
-        "last_update": null
-    }
+    "version": 1,
+    "status": "operational",
+    "updated_at": "2026-06-11T08:00:00+07:00",
+    "incidents": [
+          {
+            "id": "20260610-payment-down",
+            "title": {"vi": "Không thể thanh toán QR", "en": "QR payment not working"},
+            "status": "resolved",
+            "severity": "minor",
+            "message": {"vi": "Lỗi trang thanh toán từ bản cập nhật gần nhất. Đã cập nhật bản vá tức thì", "en": "QR payment page error from the latest update. Patched immediately."},
+            "started_at": "2026-06-10T18:10:00+07:00",
+            "resolved_at": "2026-06-10T19:05:00+07:00"
+        },
+        {
+            "id": "20260523-ai-down",
+            "title": {"vi": "AI không phản hồi", "en": "AI not responding"},
+            "status": "resolved",
+            "severity": "critical",
+            "message": {"vi": "Vượt quá hạn mức sử dụng AI cho phép của nhà cung cấp. Đã tăng hạn mức lên tối đa sau đó.", "en": "Exceeded allowed AI usage limits of the provider. Increased limits to the maximum afterwards."},
+            "started_at": "2026-05-23T14:20:00+07:00",
+            "resolved_at": "2026-05-23T16:15:00+07:00"
+        },
+        {
+            "id": "20260520-web-down",
+            "title": {"vi": "Không thể truy cập web", "en": "Web not accessible"},
+            "status": "resolved",
+            "severity": "critical",
+            "message": {"vi": "Sự cố toàn cầu từ Railway - đơn vị cung cấp server. Chi tiết: https://status.railway.com/incident/I23M92U0. Sau sự cố, OpenQuiz đã triển khai thêm phương án dự phòng", "en": "Global incident from Railway, Details: https://status.railway.com/incident/I23M92U0. After the incident, OpenQuiz has implemented additional backup measures."},
+            "started_at": "2026-05-20T05:10:00+07:00",
+            "resolved_at": "2026-05-20T09:25:00+07:00"
+        },
+         {
+            "id": "20260507-payment-down",
+            "title": {"vi": "Không thể thanh toán QR", "en": "QR payment not working"},
+            "status": "resolved",
+            "severity": "minor",
+            "message": {"vi": "Ngân hàng Kienlongbank bảo trì. Sau sự cố, OpenQuiz đã đổi ngân hàng và nhà cung cấp dịch vụ thanh toán", "en": "Kienlongbank maintenance. After the incident, OpenQuiz switched banks and payment service providers."},
+            "started_at": "2026-05-07T19:00:00+07:00",
+            "resolved_at": "2026-05-07T21:30:00+07:00"
+        },
+        {
+            "id": "20260330-data-down",
+            "title": {"vi": "Dữ liệu hiển thị không đúng", "en": "Data not displaying correctly"},
+            "status": "resolved",
+            "severity": "critical",
+            "message": {"vi": "Sự cố caching từ server của Railway. Sau sự cố, OpenQuiz đã bỏ qua caching tạm thời để khôi phục dữ liệu.", "en": "Caching issue from Railway's server. After the incident, OpenQuiz temporarily bypassed caching to restore data."},
+            "started_at": "2026-03-30T18:00:00+07:00",
+            "resolved_at": "2026-03-30T19:30:00+07:00"
+        }
+    ]
 }
