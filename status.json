@@ -16,7 +16,7 @@
             "id": "20260523-ai-down",
             "title": {"vi": "AI không phản hồi", "en": "AI not responding"},
             "status": "resolved",
-            "severity": "critical",
+            "severity": "major",
             "message": {"vi": "Vượt quá hạn mức sử dụng AI cho phép của nhà cung cấp. Đã tăng hạn mức lên tối đa sau đó.", "en": "Exceeded allowed AI usage limits of the provider. Increased limits to the maximum afterwards."},
             "started_at": "2026-05-23T14:20:00+07:00",
             "resolved_at": "2026-05-23T16:15:00+07:00"

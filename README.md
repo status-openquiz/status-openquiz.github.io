@@ -35,3 +35,12 @@ investigating — đang điều tra
 identified — đã xác định nguyên nhân
 monitoring — đã vá, đang theo dõi
 resolved — đã giải quyết
+
+
+Có 3 mức severity:
+
+Value	Màu hiển thị	Ý nghĩa
+"minor"	Xám	Sự cố nhỏ, ít ảnh hưởng
+"major"	Vàng	Sự cố đáng kể, một số tính năng bị ảnh hưởng
+"critical"	Đỏ	Sự cố nghiêm trọng, toàn bộ hệ thống bị ảnh hưởng
+Trong status.json hiện tại chưa dùng "major" lần nào cả.
