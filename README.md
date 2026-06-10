@@ -18,3 +18,20 @@
             "started_at": "2026-05-20T09:00:00+07:00",
             "resolved_at": "2026-05-20T11:30:00+07:00"
         }
+
+
+Field	Bình thường	Đang có lỗi
+status (root)	"operational"	"outage" hoặc "degraded"
+incidents[].status	"resolved"	"investigating" / "identified" / "monitoring"
+incidents[].resolved_at	timestamp	null
+Các giá trị status root:
+
+operational — hoạt động bình thường
+degraded — một số dịch vụ bị ảnh hưởng
+outage — sự cố nghiêm trọng, không truy cập được
+Các giá trị incidents[].status:
+
+investigating — đang điều tra
+identified — đã xác định nguyên nhân
+monitoring — đã vá, đang theo dõi
+resolved — đã giải quyết
